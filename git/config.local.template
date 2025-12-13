@@ -1,0 +1,22 @@
+# Local Git configuration template
+# Copy this to ~/.config/git/config.local and fill in your personal information
+# This file is NOT tracked in the dotfiles repository
+
+[user]
+	name = Your Name
+	email = your@email.com
+	# signingkey = ~/.ssh/id_ed25519.pub
+
+# Optional: GPG signing with SSH
+# [gpg]
+# 	format = ssh
+# [commit]
+# 	gpgsign = true
+
+# Optional: Custom filters (example: nbstripout for Jupyter notebooks)
+# [filter "nbstripout"]
+# 	clean = python3 -m nbstripout
+# 	smudge = cat
+# 	required = true
+# [diff "ipynb"]
+# 	textconv = python3 -m nbstripout -t

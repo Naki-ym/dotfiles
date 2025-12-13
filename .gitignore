@@ -17,8 +17,11 @@ Icon
 *.nvimlog
 
 # Local settings (private configuration)
+# Note: Excludes *.local but NOT *.local.template files
 *.local
+!*.local.template
 *.local.*
+!*.local.template
 *.private
 .env
 .env.*

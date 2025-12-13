@@ -22,32 +22,6 @@ clean: ## Remove broken symlinks
 	@find ~ -maxdepth 1 -type l ! -exec test -e {} \; -delete
 	@find ~/.config -maxdepth 1 -type l ! -exec test -e {} \; -delete 2>/dev/null || true
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 brewfile: ## Update Brewfile with currently installed packages
 	@brew bundle dump --force --file=Brewfile
 	@echo "Brewfile updated"
