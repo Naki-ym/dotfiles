@@ -120,8 +120,7 @@
                                     }
                                 ],
                                 "from": {
-                                    "key_code": "left_command",
-                                    "modifiers": { "optional": ["any"] }
+                                    "key_code": "left_command"
                                 },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 500 },
                                 "to": [{ "key_code": "left_command" }],
@@ -139,8 +138,7 @@
                                 "from": {
                                     "key_code": "spacebar",
                                     "modifiers": {
-                                        "mandatory": ["left_command"],
-                                        "optional": ["any"]
+                                        "mandatory": ["left_command"]
                                     }
                                 },
                                 "to": [{ "key_code": "japanese_kana" }],
