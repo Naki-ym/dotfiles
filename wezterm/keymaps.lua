@@ -25,6 +25,7 @@ local keys = {
 	{ key = ")", mods = "CMD|SHIFT", action = act.MoveTabRelative(1) },
 	{ key = "Space", mods = "LEADER", action = act.QuickSelect },
 	{ key = "b", mods = "CMD|SHIFT", action = act.EmitEvent("toggle-blur") },
+	{ key = "f", mods = "CMD|CTRL", action = act.EmitEvent("toggle-maximize") },
 	--- workspace
 	{ key = "n", mods = "CMD|SHIFT", action = act.SwitchWorkspaceRelative(1) },
 	{ key = "p", mods = "CMD|SHIFT", action = act.SwitchWorkspaceRelative(-1) },

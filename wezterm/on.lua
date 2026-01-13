@@ -11,6 +11,10 @@ wezterm.on("toggle-blur", function(window, _)
 	window:set_config_overrides(overrides)
 end)
 
+wezterm.on("toggle-maximize", function(window, _)
+	window:maximize()
+end)
+
 wezterm.on("gui-startup", function(cmd)
 	local _, _, window = mux.spawn_window(cmd or {})
 	local w = window:gui_window()
