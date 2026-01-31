@@ -1,0 +1,127 @@
+; IME Toggle Module for AutoHotkey v2
+; Replicates Karabiner-Elements IME behavior on Windows
+;
+; Features:
+; - CapsLock → Left Ctrl
+; - Left Ctrl (alone) → IME Off (英数/半角)
+; - Left Ctrl + Space → IME On (かな/全角)
+;
+; This provides a similar experience to macOS Karabiner-Elements
+; for Japanese input method switching.
+
+#Requires AutoHotkey v2.0
+
+;---------------------------------------------------------------
+; CapsLock → Left Control
+;---------------------------------------------------------------
+
+; Ensure CapsLock is always off
+SetCapsLockState "AlwaysOff"
+
+; Remap CapsLock to Left Control
+; The ~ prefix allows the key to retain its native function
+; (in this case, the native CapsLock is disabled above)
+*CapsLock::LCtrl
+
+;---------------------------------------------------------------
+; Left Control (alone) → IME Off
+;---------------------------------------------------------------
+
+; Track if other keys were pressed while Ctrl was held
+global ctrlUsedWithOtherKey := false
+
+; When any key is pressed while Ctrl is down, mark it as used
+~LCtrl & a::ctrlUsedWithOtherKey := true
+~LCtrl & b::ctrlUsedWithOtherKey := true
+~LCtrl & c::ctrlUsedWithOtherKey := true
+~LCtrl & d::ctrlUsedWithOtherKey := true
+~LCtrl & e::ctrlUsedWithOtherKey := true
+~LCtrl & f::ctrlUsedWithOtherKey := true
+~LCtrl & g::ctrlUsedWithOtherKey := true
+~LCtrl & h::ctrlUsedWithOtherKey := true
+~LCtrl & i::ctrlUsedWithOtherKey := true
+~LCtrl & j::ctrlUsedWithOtherKey := true
+~LCtrl & k::ctrlUsedWithOtherKey := true
+~LCtrl & l::ctrlUsedWithOtherKey := true
+~LCtrl & m::ctrlUsedWithOtherKey := true
+~LCtrl & n::ctrlUsedWithOtherKey := true
+~LCtrl & o::ctrlUsedWithOtherKey := true
+~LCtrl & p::ctrlUsedWithOtherKey := true
+~LCtrl & q::ctrlUsedWithOtherKey := true
+~LCtrl & r::ctrlUsedWithOtherKey := true
+~LCtrl & s::ctrlUsedWithOtherKey := true
+~LCtrl & t::ctrlUsedWithOtherKey := true
+~LCtrl & u::ctrlUsedWithOtherKey := true
+~LCtrl & v::ctrlUsedWithOtherKey := true
+~LCtrl & w::ctrlUsedWithOtherKey := true
+~LCtrl & x::ctrlUsedWithOtherKey := true
+~LCtrl & y::ctrlUsedWithOtherKey := true
+~LCtrl & z::ctrlUsedWithOtherKey := true
+
+; When Left Control is released
+~LCtrl up:: {
+    global ctrlUsedWithOtherKey
+
+    ; If Ctrl was pressed alone (no other key was pressed)
+    if (!ctrlUsedWithOtherKey && A_PriorKey = "LControl") {
+        ; Send IME Off key
+        ; vkF3 = 無変換 (Muhenkan) - works with Microsoft IME
+        ; Alternative: vk1Dsc07B for some IME configurations
+        Send "{vkF3}"
+    }
+
+    ; Reset the flag
+    ctrlUsedWithOtherKey := false
+}
+
+;---------------------------------------------------------------
+; Left Control + Space → IME On
+;---------------------------------------------------------------
+
+; Ctrl + Space toggles IME to hiragana mode
+LCtrl & Space:: {
+    global ctrlUsedWithOtherKey
+    ctrlUsedWithOtherKey := true
+
+    ; Send IME On key
+    ; vkF4 = 変換 (Henkan) - works with Microsoft IME
+    ; Alternative: vkF2 = ひらがな for some IME configurations
+    Send "{vkF4}"
+}
+
+;---------------------------------------------------------------
+; Alternative IME Key Codes (Uncomment if needed)
+;---------------------------------------------------------------
+
+; Google日本語入力の場合:
+; Send "{vk1Dsc07B}"  ; 無変換
+; Send "{vk1Csc079}"  ; 変換
+
+; 一部のIMEでは以下が必要:
+; IME Off: Send "{vkF3}" または Send "{Esc}{Esc}"
+; IME On:  Send "{vkF4}" または Send "{vkF2}"
+
+;---------------------------------------------------------------
+; Debug Mode (Uncomment for troubleshooting)
+;---------------------------------------------------------------
+
+; Shows a tooltip when IME toggle is triggered
+; Useful for debugging if the keys aren't working
+
+; ~LCtrl up:: {
+;     global ctrlUsedWithOtherKey
+;     if (!ctrlUsedWithOtherKey && A_PriorKey = "LControl") {
+;         ToolTip "IME Off (vkF3)"
+;         SetTimer () => ToolTip(), -1000
+;         Send "{vkF3}"
+;     }
+;     ctrlUsedWithOtherKey := false
+; }
+;
+; LCtrl & Space:: {
+;     global ctrlUsedWithOtherKey
+;     ctrlUsedWithOtherKey := true
+;     ToolTip "IME On (vkF4)"
+;     SetTimer () => ToolTip(), -1000
+;     Send "{vkF4}"
+; }

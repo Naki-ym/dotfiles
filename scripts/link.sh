@@ -20,6 +20,23 @@ skip() {
     echo -e "${BLUE}[SKIP]${NC} $1"
 }
 
+RED='\033[0;31m'
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+# Check for Windows
+case "$(uname -s)" in
+    CYGWIN*|MINGW*|MSYS*|Windows_NT)
+        error "Windows detected. Please use PowerShell script instead:
+    .\\scripts\\link.ps1
+
+For detailed Windows setup instructions, see README.md"
+        ;;
+esac
+
 # Dotfiles directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
