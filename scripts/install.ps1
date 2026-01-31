@@ -139,8 +139,9 @@ if (-not $SkipPackages -and -not $SkipScoop) {
             # Security mitigations:
             #   1. TLS 1.2+ enforced (prevents downgrade attacks)
             #   2. SHA256 hash displayed (allows manual verification)
-            #   3. 5-second delay (allows user to abort)
+            #   3. Explicit user confirmation required
             #   4. Downloaded to file first (can be inspected before execution)
+            #   5. Option to skip and install manually
 
             $scoopInstaller = Join-Path $env:TEMP "scoop-install.ps1"
             Write-Info "Downloading Scoop installer from https://get.scoop.sh ..."
@@ -150,21 +151,48 @@ if (-not $SkipPackages -and -not $SkipScoop) {
 
             Invoke-WebRequest -Uri "https://get.scoop.sh" -OutFile $scoopInstaller -UseBasicParsing
 
-            # Show hash for verification
+            # Show hash and require explicit confirmation
             $hash = (Get-FileHash $scoopInstaller -Algorithm SHA256).Hash
-            Write-Warn "Security Notice: You are about to execute a downloaded script."
+            Write-Host ""
+            Write-Warn "=== Security Notice ==="
+            Write-Warn "You are about to execute a downloaded script."
             Write-Info "Installer SHA256: $hash"
-            Write-Info "Verify at: https://github.com/ScoopInstaller/Install"
+            Write-Info "Verify hash at: https://github.com/ScoopInstaller/Install"
             Write-Info "Inspect script: notepad $scoopInstaller"
-            Write-Info "Press Ctrl+C within 5 seconds to abort..."
-            Start-Sleep -Seconds 5
+            Write-Host ""
 
-            # Execute the downloaded script
-            & $scoopInstaller
+            $runInstaller = $false
+            if ($Force) {
+                Write-Info "Force flag specified - proceeding with installation."
+                $runInstaller = $true
+            } else {
+                Write-Host "Options:" -ForegroundColor Cyan
+                Write-Host "  [Y] Yes, run the installer"
+                Write-Host "  [N] No, skip Scoop (install manually later)"
+                Write-Host "  [I] Inspect the script first (opens in notepad)"
+                $choice = Read-Host "Your choice"
+
+                switch ($choice.ToUpper()) {
+                    'Y' { $runInstaller = $true }
+                    'I' {
+                        Start-Process notepad $scoopInstaller -Wait
+                        $confirm = Read-Host "Run the installer now? (y/N)"
+                        if ($confirm -eq 'y') { $runInstaller = $true }
+                    }
+                    default {
+                        Write-Info "Skipping Scoop installation."
+                        Write-Info "To install manually: irm get.scoop.sh | iex"
+                    }
+                }
+            }
+
+            if ($runInstaller) {
+                & $scoopInstaller
+                Write-Success "Scoop installed successfully!"
+                $scoopInstalled = $true
+            }
+
             Remove-Item $scoopInstaller -Force -ErrorAction SilentlyContinue
-
-            Write-Success "Scoop installed successfully!"
-            $scoopInstalled = $true
         } catch {
             Write-Warn "Failed to install Scoop: $_"
             Write-Info "You can manually install from: https://scoop.sh"
