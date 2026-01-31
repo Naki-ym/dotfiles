@@ -28,7 +28,7 @@ sharkdp.fd
 # Programming Languages (Official builds)
 # ========================================
 GoLang.Go
-Python.Python.3.12
+Python.Python.3
 OpenJS.NodeJS
 Rustlang.Rustup
 

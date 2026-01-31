@@ -118,10 +118,9 @@ if (Test-Path $pythonBase) {
 }
 
 foreach ($path in $pathsToAdd) {
-    # Use exact match instead of -notlike to avoid false positives
-    # (e.g., "C:\bin" incorrectly matching "C:\binary")
+    # Use case-insensitive exact match (Windows paths are case-insensitive)
     $pathList = $env:PATH -split ';'
-    if ((Test-Path $path) -and ($pathList -notcontains $path)) {
+    if ((Test-Path $path) -and ($pathList -inotcontains $path)) {
         $env:PATH = "$path;$env:PATH"
     }
 }

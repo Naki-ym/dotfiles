@@ -6,6 +6,9 @@
 ; - Left Ctrl (alone) → IME Off (英数/半角)
 ; - Left Ctrl + Space → IME On (かな/全角)
 ;
+; Note: Only LEFT Ctrl triggers IME toggle (not Right Ctrl).
+; This matches macOS Karabiner behavior where CapsLock→Ctrl is used.
+;
 ; This provides a similar experience to macOS Karabiner-Elements
 ; for Japanese input method switching.
 

@@ -131,7 +131,7 @@ function grhs { git reset HEAD --soft $args }
 function grhh {
     Write-Host "WARNING: This will discard all uncommitted changes!" -ForegroundColor Red
     $confirm = Read-Host "Continue? (y/N)"
-    if ($confirm -eq 'y') { git reset HEAD --hard $args }
+    if ($confirm -ieq 'y') { git reset HEAD --hard $args }
 }
 
 # WARNING: Destructive command - deletes untracked files
@@ -139,7 +139,7 @@ function gclean {
     Write-Host "WARNING: This will delete untracked files!" -ForegroundColor Red
     git clean -fd --dry-run
     $confirm = Read-Host "Continue? (y/N)"
-    if ($confirm -eq 'y') { git clean -fd $args }
+    if ($confirm -ieq 'y') { git clean -fd $args }
 }
 
 # WARNING: Destructive command - deletes untracked files including ignored
@@ -147,7 +147,7 @@ function gcleanx {
     Write-Host "WARNING: This will delete ALL untracked files (including ignored)!" -ForegroundColor Red
     git clean -fdx --dry-run
     $confirm = Read-Host "Continue? (y/N)"
-    if ($confirm -eq 'y') { git clean -fdx $args }
+    if ($confirm -ieq 'y') { git clean -fdx $args }
 }
 
 # WARNING: Destructive command - resets to pristine state
@@ -156,7 +156,7 @@ function gpristine {
     Write-Host "  - git reset --hard" -ForegroundColor Yellow
     Write-Host "  - git clean -fdx" -ForegroundColor Yellow
     $confirm = Read-Host "Continue? (y/N)"
-    if ($confirm -eq 'y') {
+    if ($confirm -ieq 'y') {
         git reset --hard
         git clean -fdx
     }

@@ -139,10 +139,18 @@ if (-not $SkipPackages -and -not $SkipScoop) {
 
             try {
                 # Download Scoop installer to temp file
-                # SECURITY NOTE: This executes a remote script. While we enforce TLS 1.2
-                # and display the hash, there is no programmatic integrity verification.
-                # The hash changes with each Scoop update, making pinning impractical.
-                # By requiring -InstallScoop flag, users explicitly accept this risk.
+                # SECURITY TRADE-OFF EXPLANATION:
+                # - Scoop is not available via winget or other verified package managers
+                # - The installer hash changes with each Scoop release (no stable hash to pin)
+                # - Scoop does not publish signed releases or official hash manifests
+                # - Therefore, programmatic integrity verification is not feasible
+                #
+                # Mitigations in place:
+                # - Opt-in required (-InstallScoop flag)
+                # - TLS 1.2+ enforced
+                # - SHA256 displayed for manual verification
+                # - User confirmation before execution
+                # - Option to inspect script before running
 
                 $scoopInstaller = Join-Path $env:TEMP "scoop-install.ps1"
                 Write-Info "Downloading Scoop installer from https://get.scoop.sh ..."
@@ -216,12 +224,12 @@ if (-not $SkipPackages -and -not $SkipScoop) {
             # Try object output first (with Name property)
             $currentBuckets = $bucketOutput | ForEach-Object {
                 if ($_ -is [PSCustomObject] -and $_.Name) {
-                    $_.Name
+                    $_.Name.Trim()
                 } elseif ($_ -is [string] -and $_.Trim()) {
                     # Parse text: first whitespace-separated token is bucket name
-                    ($_ -split '\s+')[0]
+                    (($_ -split '\s+')[0]).Trim()
                 }
-            } | Where-Object { $_ -and $_.ToString().Trim() -ne "" }
+            } | Where-Object { $_ -and $_ -ne "" }
         }
 
         # Check for unauthorized buckets

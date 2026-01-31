@@ -206,14 +206,26 @@ function extract {
             Write-Host "Extracted to: $Destination" -ForegroundColor Green
         }
         ".tar" {
+            if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
+                Write-Host "tar command not found. Requires Windows 10 1803+ or install manually." -ForegroundColor Red
+                return
+            }
             tar -xf $Path -C $Destination
             Write-Host "Extracted to: $Destination" -ForegroundColor Green
         }
         ".gz" {
+            if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
+                Write-Host "tar command not found. Requires Windows 10 1803+ or install manually." -ForegroundColor Red
+                return
+            }
             tar -xzf $Path -C $Destination
             Write-Host "Extracted to: $Destination" -ForegroundColor Green
         }
         ".tgz" {
+            if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
+                Write-Host "tar command not found. Requires Windows 10 1803+ or install manually." -ForegroundColor Red
+                return
+            }
             tar -xzf $Path -C $Destination
             Write-Host "Extracted to: $Destination" -ForegroundColor Green
         }

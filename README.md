@@ -27,6 +27,9 @@ brew bundle install
 
 ### Windows
 
+> **推奨**: シンボリックリンク作成には**開発者モード**が必要です。
+> 設定 → プライバシーとセキュリティ → 開発者向け → 開発者モード
+
 ```powershell
 # リポジトリをクローン
 git clone https://github.com/YOUR_USERNAME/dotfiles.git $env:USERPROFILE\dotfiles
