@@ -374,11 +374,15 @@ $pathsToAdd = @(
 )
 
 $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+if ([string]::IsNullOrEmpty($currentPath)) {
+    $currentPath = ""
+}
+$pathList = $currentPath -split ';'
 $pathsAdded = @()
 
 foreach ($pathToAdd in $pathsToAdd) {
     if (Test-Path $pathToAdd) {
-        if ($currentPath -notlike "*$pathToAdd*") {
+        if ($pathList -inotcontains $pathToAdd) {
             $pathsAdded += $pathToAdd
         } else {
             Write-Info "Already in PATH: $pathToAdd"
@@ -390,7 +394,7 @@ foreach ($pathToAdd in $pathsToAdd) {
 
 if ($pathsAdded.Count -gt 0) {
     if ($platformInfo.IsAdmin) {
-        $newPath = $currentPath + ";" + ($pathsAdded -join ";")
+        $newPath = $currentPath.TrimEnd(';') + ";" + ($pathsAdded -join ";")
         [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
         foreach ($p in $pathsAdded) {
             Write-Success "Added to system PATH: $p"
@@ -399,9 +403,8 @@ if ($pathsAdded.Count -gt 0) {
     } else {
         Write-Warn "Administrator privileges required to modify system PATH"
         Write-Info "Run the following command as Administrator:"
-        foreach ($p in $pathsAdded) {
-            Write-Info "  [Environment]::SetEnvironmentVariable('Path', `$env:Path + ';$p', 'Machine')"
-        }
+        $pathsToAppend = $pathsAdded -join ';'
+        Write-Info "  [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';$pathsToAppend', 'Machine')"
     }
 }
 
