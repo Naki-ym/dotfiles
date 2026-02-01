@@ -24,7 +24,7 @@ IME_SetState(state, winTitle := "A") {
     static WM_IME_CONTROL := 0x283
     static IMC_SETOPENSTATUS := 0x6
 
-    hwnd := WinGetID(winTitle)
+    hwnd := WinExist(winTitle)
     if !hwnd
         return
 
