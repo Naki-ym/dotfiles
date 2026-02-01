@@ -12,6 +12,42 @@
 #Requires AutoHotkey v2.0
 
 ;---------------------------------------------------------------
+; IME Control Functions (using Windows API)
+; These functions directly control IME state without relying on
+; keyboard shortcuts that may behave differently per IME settings.
+;---------------------------------------------------------------
+
+; Get IME status (0 = Off, 1 = On)
+IME_GetState(winTitle := "A") {
+    hwnd := WinGetID(winTitle)
+    if !hwnd
+        return -1
+
+    ; Get the default IME window for this thread
+    imeWnd := DllCall("imm32\ImmGetDefaultIMEWnd", "Ptr", hwnd, "Ptr")
+    if !imeWnd
+        return -1
+
+    ; WM_IME_CONTROL = 0x283, IMC_GETOPENSTATUS = 0x5
+    return SendMessage(0x283, 0x5, 0, imeWnd)
+}
+
+; Set IME status (0 = Off, 1 = On)
+IME_SetState(state, winTitle := "A") {
+    hwnd := WinGetID(winTitle)
+    if !hwnd
+        return -1
+
+    ; Get the default IME window for this thread
+    imeWnd := DllCall("imm32\ImmGetDefaultIMEWnd", "Ptr", hwnd, "Ptr")
+    if !imeWnd
+        return -1
+
+    ; WM_IME_CONTROL = 0x283, IMC_SETOPENSTATUS = 0x6
+    return SendMessage(0x283, 0x6, state, imeWnd)
+}
+
+;---------------------------------------------------------------
 ; CapsLock → Left Control
 ;---------------------------------------------------------------
 
@@ -29,12 +65,11 @@ SetCapsLockState "AlwaysOff"
 ~LCtrl up:: {
     ; A_PriorKey contains the name of the last key pressed before the current one
     ; If it's "LControl", that means Left Ctrl was pressed and released without other keys.
-    ; Because CapsLock is remapped to LCtrl at the scan code level (line 22),
+    ; Because CapsLock is remapped to LCtrl at the scan code level,
     ; releasing CapsLock alone also results in A_PriorKey being "LControl".
     if (A_PriorKey = "LControl") {
-        ; Send IME Off key
-        ; vkF3 = 無変換 (Muhenkan) - works with Microsoft IME
-        Send "{vkF3}"
+        ; Use API to reliably turn IME Off
+        IME_SetState(0)
     }
 }
 
@@ -47,19 +82,6 @@ SetCapsLockState "AlwaysOff"
 ; was caused by defining 80+ LCtrl & key combinations which interfered with
 ; normal Ctrl shortcuts.
 LCtrl & Space:: {
-    ; Send IME On key
-    ; vkF4 = 変換 (Henkan) - works with Microsoft IME
-    Send "{vkF4}"
+    ; Use API to reliably turn IME On
+    IME_SetState(1)
 }
-
-;---------------------------------------------------------------
-; Alternative IME Key Codes (Uncomment if needed)
-;---------------------------------------------------------------
-
-; Google日本語入力の場合:
-; Send "{vk1Dsc07B}"  ; 無変換
-; Send "{vk1Csc079}"  ; 変換
-
-; 一部のIMEでは以下が必要:
-; IME Off: Send "{vkF3}" または Send "{Esc}{Esc}"
-; IME On:  Send "{vkF4}" または Send "{vkF2}"
