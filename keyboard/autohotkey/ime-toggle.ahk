@@ -70,6 +70,11 @@ SetCapsLockState "AlwaysOff"
 ; was caused by defining 80+ LCtrl & key combinations which interfered with
 ; normal Ctrl shortcuts.
 LCtrl & Space:: {
-    ; Use API to reliably turn IME On
-    IME_SetState(1)
+    ; Send Henkan (変換) key to switch to Hiragana mode.
+    ; Note: IME_SetState(1) only turns IME "on" but doesn't guarantee Hiragana mode,
+    ; so we use key simulation here (asymmetric with IME Off which uses API).
+    ; For Microsoft IME, vkF4 reliably switches to Hiragana input.
+    ; For Google Japanese Input, use vk1Csc079 instead:
+    ;   Send "{vk1Csc079}"
+    Send "{vkF4}"
 }
