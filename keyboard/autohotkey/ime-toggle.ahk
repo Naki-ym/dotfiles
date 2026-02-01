@@ -12,27 +12,53 @@
 #Requires AutoHotkey v2.0
 
 ;---------------------------------------------------------------
-; IME Control Functions (using Windows API)
-; These functions directly control IME state without relying on
-; keyboard shortcuts that may behave differently per IME settings.
+; IME Control Functions (using Windows IMM32 API)
+;
+; Uses ImmSetOpenStatus / ImmSetConversionStatus for reliable
+; IME control. This is more reliable than WM_IME_CONTROL messages
+; or sending virtual keys (vkF3/vkF4) which may toggle instead of
+; setting a specific state depending on IME configuration.
+;
+; Note: These are best-effort operations. IME behavior can vary
+; depending on the IME implementation (Microsoft IME, Google IME, etc.)
 ;---------------------------------------------------------------
 
-; Set IME status (0 = Off, 1 = On)
-; Note: This is a best-effort operation. The IME API return value is
-; IME-implementation-defined and not reliable for success/failure detection.
-IME_SetState(state, winTitle := "A") {
-    static WM_IME_CONTROL := 0x283
-    static IMC_SETOPENSTATUS := 0x6
+; Turn IME Off (半角/英数)
+IME_Off(winTitle := "A") {
+    hwnd := WinExist(winTitle)
+    if !hwnd
+        return
+
+    hIMC := DllCall("imm32\ImmGetContext", "Ptr", hwnd, "Ptr")
+    if !hIMC
+        return
+
+    DllCall("imm32\ImmSetOpenStatus", "Ptr", hIMC, "Int", 0)
+    DllCall("imm32\ImmReleaseContext", "Ptr", hwnd, "Ptr", hIMC)
+}
+
+; Turn IME On and set to Hiragana mode (ひらがな/全角)
+IME_On(winTitle := "A") {
+    static IME_CMODE_NATIVE := 0x0001      ; Japanese mode
+    static IME_CMODE_FULLSHAPE := 0x0008   ; Full-width characters
+    static IME_CMODE_HIRAGANA := IME_CMODE_NATIVE | IME_CMODE_FULLSHAPE
 
     hwnd := WinExist(winTitle)
     if !hwnd
         return
 
-    imeWnd := DllCall("imm32\ImmGetDefaultIMEWnd", "Ptr", hwnd, "Ptr")
-    if !imeWnd
+    hIMC := DllCall("imm32\ImmGetContext", "Ptr", hwnd, "Ptr")
+    if !hIMC
         return
 
-    DllCall("user32\SendMessageW", "Ptr", imeWnd, "UInt", WM_IME_CONTROL, "Ptr", IMC_SETOPENSTATUS, "Ptr", state)
+    ; Turn IME on
+    DllCall("imm32\ImmSetOpenStatus", "Ptr", hIMC, "Int", 1)
+
+    ; Set conversion mode to Hiragana
+    ; Second parameter: conversion mode, Third parameter: sentence mode (0 = default)
+    DllCall("imm32\ImmSetConversionStatus", "Ptr", hIMC, "UInt", IME_CMODE_HIRAGANA, "UInt", 0)
+
+    DllCall("imm32\ImmReleaseContext", "Ptr", hwnd, "Ptr", hIMC)
 }
 
 ;---------------------------------------------------------------
@@ -56,8 +82,7 @@ SetCapsLockState "AlwaysOff"
     ; Because CapsLock is remapped to LCtrl by AutoHotkey,
     ; releasing CapsLock alone also results in A_PriorKey being "LControl".
     if (A_PriorKey = "LControl") {
-        ; Use API to reliably turn IME Off
-        IME_SetState(0)
+        IME_Off()
     }
 }
 
@@ -70,11 +95,5 @@ SetCapsLockState "AlwaysOff"
 ; was caused by defining 80+ LCtrl & key combinations which interfered with
 ; normal Ctrl shortcuts.
 LCtrl & Space:: {
-    ; Send Henkan (変換) key to switch to Hiragana mode.
-    ; Note: IME_SetState(1) only turns IME "on" but doesn't guarantee Hiragana mode,
-    ; so we use key simulation here (asymmetric with IME Off which uses API).
-    ; For Microsoft IME, vkF4 reliably switches to Hiragana input.
-    ; For Google Japanese Input, use vk1Csc079 instead:
-    ;   Send "{vk1Csc079}"
-    Send "{vkF4}"
+    IME_On()
 }
