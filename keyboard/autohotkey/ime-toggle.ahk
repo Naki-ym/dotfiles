@@ -17,24 +17,6 @@
 ; keyboard shortcuts that may behave differently per IME settings.
 ;---------------------------------------------------------------
 
-; Get IME status
-; Returns: 0 = Off, 1 = On, -1 = Error (window not found)
-IME_GetState(winTitle := "A") {
-    static WM_IME_CONTROL := 0x283
-    static IMC_GETOPENSTATUS := 0x5
-
-    hwnd := WinGetID(winTitle)
-    if !hwnd
-        return -1
-
-    imeWnd := DllCall("imm32\ImmGetDefaultIMEWnd", "Ptr", hwnd, "Ptr")
-    if !imeWnd
-        return -1
-
-    ; Use DllCall to send message directly to IME window handle
-    return DllCall("SendMessage", "Ptr", imeWnd, "UInt", WM_IME_CONTROL, "Ptr", IMC_GETOPENSTATUS, "Ptr", 0, "Ptr")
-}
-
 ; Set IME status (0 = Off, 1 = On)
 ; Note: This is a best-effort operation. The IME API return value is
 ; IME-implementation-defined and not reliable for success/failure detection.
@@ -50,8 +32,7 @@ IME_SetState(state, winTitle := "A") {
     if !imeWnd
         return
 
-    ; Send message directly to IME window handle
-    DllCall("SendMessage", "Ptr", imeWnd, "UInt", WM_IME_CONTROL, "Ptr", IMC_SETOPENSTATUS, "Ptr", state, "Ptr")
+    DllCall("user32\SendMessageW", "Ptr", imeWnd, "UInt", WM_IME_CONTROL, "Ptr", IMC_SETOPENSTATUS, "Ptr", state)
 }
 
 ;---------------------------------------------------------------
