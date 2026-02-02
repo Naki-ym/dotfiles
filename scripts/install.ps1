@@ -376,13 +376,13 @@ $wingetPackagesDir = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages"
 if (Test-Path $wingetPackagesDir) {
     $winlibsDir = Get-ChildItem -Path $wingetPackagesDir -Directory -Filter "BrechtSanders.WinLibs*" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($winlibsDir) {
-        $winlibsFound = $true
         # Try known architecture layouts (64-bit first, then 32-bit)
         $mingwBinCandidates = @("mingw64\bin", "mingw32\bin")
         foreach ($relBinPath in $mingwBinCandidates) {
             $candidateBin = Join-Path $winlibsDir.FullName $relBinPath
             if (Test-Path $candidateBin) {
                 $winlibsPath = $candidateBin
+                $winlibsFound = $true
                 Write-Info "Found WinLibs at: $winlibsPath"
                 break
             }
