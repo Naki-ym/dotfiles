@@ -371,7 +371,6 @@ Write-Info "Configuring PATH for development tools..."
 
 # WinLibs (MinGW-w64) path detection
 $winlibsPath = $null
-$winlibsFound = $false
 $wingetPackagesDir = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages"
 if (Test-Path $wingetPackagesDir) {
     $winlibsDir = Get-ChildItem -Path $wingetPackagesDir -Directory -Filter "BrechtSanders.WinLibs*" -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -382,7 +381,6 @@ if (Test-Path $wingetPackagesDir) {
             $candidateBin = Join-Path $winlibsDir.FullName $relBinPath
             if (Test-Path $candidateBin) {
                 $winlibsPath = $candidateBin
-                $winlibsFound = $true
                 Write-Info "Found WinLibs at: $winlibsPath"
                 break
             }
@@ -391,9 +389,11 @@ if (Test-Path $wingetPackagesDir) {
             Write-Warn "WinLibs found at '$($winlibsDir.FullName)', but no MinGW bin directory detected"
             Write-Info "Try reinstalling: winget uninstall --id BrechtSanders.WinLibs.POSIX.UCRT && winget install --id BrechtSanders.WinLibs.POSIX.UCRT"
         }
+    } else {
+        Write-Warn "WinLibs (MinGW-w64) not found. GCC will not be added to PATH."
+        Write-Info "Install with: winget install --id BrechtSanders.WinLibs.POSIX.UCRT"
     }
-}
-if (-not $winlibsFound) {
+} else {
     Write-Warn "WinLibs (MinGW-w64) not found. GCC will not be added to PATH."
     Write-Info "Install with: winget install --id BrechtSanders.WinLibs.POSIX.UCRT"
 }
