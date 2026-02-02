@@ -64,6 +64,7 @@ Microsoft.VisualStudioCode
 # AI Tools
 # ========================================
 Anthropic.ClaudeCode
+ElementLabs.LMStudio
 
 # ========================================
 # Excluded - Use Scoop Instead
