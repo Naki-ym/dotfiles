@@ -39,7 +39,7 @@ LLVM.LLVM
 # Programming Languages (Official builds)
 # ========================================
 GoLang.Go
-Python.Python.3
+Python.Python.3.12
 OpenJS.NodeJS
 Rustlang.Rustup
 
