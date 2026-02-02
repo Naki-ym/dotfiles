@@ -14,16 +14,26 @@ function Get-PlatformInfo {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     $info.IsAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-    # Check Developer Mode by testing symbolic link creation
+    # Check Developer Mode by testing file symbolic link creation
+    # Directory symlinks work with Admin privileges, but file symlinks require Developer Mode
     # Registry key location changed in Windows 11 25H2, so we test actual capability
     try {
-        $testPath = Join-Path $env:TEMP "dotfiles-symlink-test-$(Get-Random)"
-        $testTarget = $env:TEMP
-        New-Item -ItemType SymbolicLink -Path $testPath -Target $testTarget -ErrorAction Stop | Out-Null
-        Remove-Item -Path $testPath -Force -ErrorAction SilentlyContinue
+        $testFile = Join-Path $env:TEMP "dotfiles-symlink-test-file-$(Get-Random).txt"
+        $testLink = Join-Path $env:TEMP "dotfiles-symlink-test-link-$(Get-Random).txt"
+        # Create a temporary file as target
+        Set-Content -Path $testFile -Value "test" -ErrorAction Stop
+        # Try to create a file symbolic link (requires Developer Mode)
+        New-Item -ItemType SymbolicLink -Path $testLink -Target $testFile -ErrorAction Stop | Out-Null
         $info.IsDeveloperModeEnabled = $true
+        # Cleanup
+        Remove-Item -Path $testLink -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $testFile -Force -ErrorAction SilentlyContinue
     } catch {
-        # Symbolic link creation failed, Developer Mode likely disabled
+        # File symbolic link creation failed, Developer Mode likely disabled
+        # Cleanup test file if it was created
+        if ($testFile -and (Test-Path $testFile)) {
+            Remove-Item -Path $testFile -Force -ErrorAction SilentlyContinue
+        }
     }
 
     return $info
