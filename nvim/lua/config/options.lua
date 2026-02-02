@@ -1,5 +1,10 @@
 -- treesitter用のCコンパイラ (Windows)
-vim.env.CC = "gcc"
+if (vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1)
+  and vim.env.CC == nil
+  and vim.fn.executable("gcc") == 1
+then
+  vim.env.CC = "gcc"
+end
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
