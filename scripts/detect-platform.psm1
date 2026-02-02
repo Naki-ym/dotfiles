@@ -14,14 +14,16 @@ function Get-PlatformInfo {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     $info.IsAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-    # Check Developer Mode (Windows 10 1607+ / Windows 11)
+    # Check Developer Mode by testing symbolic link creation
+    # Registry key location changed in Windows 11 25H2, so we test actual capability
     try {
-        $devMode = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -ErrorAction SilentlyContinue
-        if ($devMode -and $devMode.AllowDevelopmentWithoutDevLicense -eq 1) {
-            $info.IsDeveloperModeEnabled = $true
-        }
+        $testPath = Join-Path $env:TEMP "dotfiles-symlink-test-$(Get-Random)"
+        $testTarget = $env:TEMP
+        New-Item -ItemType SymbolicLink -Path $testPath -Target $testTarget -ErrorAction Stop | Out-Null
+        Remove-Item -Path $testPath -Force -ErrorAction SilentlyContinue
+        $info.IsDeveloperModeEnabled = $true
     } catch {
-        # Developer mode check failed, assume disabled
+        # Symbolic link creation failed, Developer Mode likely disabled
     }
 
     return $info
@@ -71,7 +73,7 @@ function Show-PlatformInfo {
         Write-Host "`nWarning: Developer Mode is not enabled." -ForegroundColor Yellow
         Write-Host "Symbolic links will not work. Junctions will be used for directories instead." -ForegroundColor Yellow
         Write-Host "To enable Developer Mode:" -ForegroundColor Yellow
-        Write-Host "  Settings > Privacy & Security > For developers > Developer Mode" -ForegroundColor White
+        Write-Host "  Settings > System > For developers > Developer Mode" -ForegroundColor White
     }
 
     return $info
