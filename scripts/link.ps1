@@ -229,6 +229,25 @@ if (Test-Path $ahkSource) {
     Write-Info "Run Phase 4 implementation to create AutoHotkey configuration"
 }
 
+# Claude Code
+Write-Info "`nLinking Claude Code configuration..."
+$claudeDir = Join-Path $env:USERPROFILE ".claude"
+if (-not (Test-Path $claudeDir)) {
+    New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null
+}
+
+$claudeSettingsSource = Join-Path $DOTFILES_DIR "claude\settings.json"
+$claudeSettingsDest = Join-Path $claudeDir "settings.json"
+New-FileLink -Source $claudeSettingsSource -Destination $claudeSettingsDest
+
+$claudeMdSource = Join-Path $DOTFILES_DIR "claude\CLAUDE.md"
+$claudeMdDest = Join-Path $claudeDir "CLAUDE.md"
+New-FileLink -Source $claudeMdSource -Destination $claudeMdDest
+
+$claudeSkillsSource = Join-Path $DOTFILES_DIR "claude\skills"
+$claudeSkillsDest = Join-Path $claudeDir "skills"
+New-DirectoryLink -Source $claudeSkillsSource -Destination $claudeSkillsDest
+
 Write-Success "`nSymbolic link creation complete!"
 
 if (-not $useDeveloperMode) {
