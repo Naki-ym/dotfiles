@@ -49,13 +49,6 @@ feat: 共通部分分析ページを追加
 - マッチ件数の表示
 ```
 
-## PR規約
-
-- **`.github/pull_request_template.md` のテンプレートに必ず従って記述する**
-- テンプレートの全セクション（概要・変更種別・変更内容・動作確認・スクリーンショット・関連Issue）を埋める
-- 1つのPRは1つの目的に絞る
-- WIP（作業中）の場合はタイトルに `[WIP]` を付ける
-
 ## レビュー対応規約
 
 PRのレビュー（Copilot含む）で指摘を受けた場合、すべての指摘項目について以下のいずれかで対応する:
@@ -89,31 +82,6 @@ PRのレビュー（Copilot含む）で指摘を受けた場合、すべての�
 
 ## 禁止事項
 
-### eslint-disable 禁止
-
-以下のようなlint無効化コメントは**禁止**:
-
-```typescript
-// eslint-disable-next-line
-/* eslint-disable */
-// @ts-ignore
-// @ts-nocheck
-```
+### lint無効化コメント禁止
 
 lintエラーが出た場合は、コメントで無効化せず**コードを修正**すること。
-
-### any型 禁止
-
-`any` 型の使用は**禁止**:
-
-```typescript
-// NG
-const data: any = fetchData();
-function process(input: any): any { }
-
-// OK
-const data: unknown = fetchData();
-function process(input: string): Result { }
-```
-
-型が不明な場合は `unknown` を使い、型ガードで絞り込む。
