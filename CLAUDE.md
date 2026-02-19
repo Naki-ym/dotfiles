@@ -10,6 +10,10 @@ This is a personal dotfiles repository for managing development environment conf
 
 ```
 dotfiles/
+├── claude/                  # Claude Code configuration
+│   ├── CLAUDE.md           # Global development guidelines
+│   ├── settings.json       # Global settings
+│   └── skills/             # Custom skills
 ├── fish/                    # Fish shell configuration
 │   ├── config.fish         # Main Fish config
 │   └── config/             # Modular configs
@@ -65,6 +69,12 @@ dotfiles/
 ### Karabiner
 - **Config**: `karabiner/karabiner.json`
 - Customizes keyboard mappings for macOS
+
+### Claude Code
+- **Settings**: `claude/settings.json` (symlinked to `~/.claude/settings.json`)
+- **CLAUDE.md**: `claude/CLAUDE.md` (symlinked to `~/.claude/CLAUDE.md`)
+- **Skills**: `claude/skills/` (symlinked to `~/.claude/skills/`)
+- Contains global settings, development guidelines, and custom skills (e.g., `/resolve`)
 
 ## Installation Workflow
 

@@ -69,6 +69,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 - **WezTerm** - ターミナルエミュレータ（Kanagawa/OneDarkテーマ、プラットフォーム対応キーバインド）
 - **Neovim** - エディタ（Lazy.nvimでプラグイン管理）
 - **Git** - バージョン管理（delta diff付き）
+- **Claude Code** - AI開発アシスタント（設定・スキル管理）
 
 ### macOS
 - **Fish** - シェル
@@ -90,6 +91,7 @@ dotfiles/
 ├── shell/          # PowerShell設定（Windows）
 ├── keyboard/       # AutoHotkey設定（Windows）
 ├── packages/       # パッケージ管理（Winget）
+├── claude/         # Claude Code設定
 ├── scripts/        # セットアップスクリプト
 ├── Brewfile        # Homebrewパッケージリスト
 └── Makefile        # タスクランナー
